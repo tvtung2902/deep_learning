@@ -16,7 +16,7 @@ class CustomDataset(Dataset):
         for data_file in data_files:
             with open(data_file, "rb") as f:
                 data = pickle.load(f, encoding="bytes")
-                self.images.extend(data[b'data-cifar'])
+                self.images.extend(data[b'data'])
                 self.labels.extend(data[b'labels'])
 
     def __len__(self):
@@ -28,7 +28,7 @@ class CustomDataset(Dataset):
         return image, label
 
 if __name__ == '__main__':
-    data_set = CustomDataset('./data-cifar/cifar-10-batches-py', train = True)
+    data_set = CustomDataset('../all-data/data-cifar/cifar-10-batches-py', train = True)
     image, label = data_set[1]
     print(image)
     image = np.reshape(image, (3, 32, 32))

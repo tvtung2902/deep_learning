@@ -10,4 +10,4 @@ class AnimalDataset(Dataset):
         pass
 
 if __name__ == '__main__':
-    root = 'animal-dataset'
+    root = 'all-data/animal-dataset'
