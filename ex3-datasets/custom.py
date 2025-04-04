@@ -6,7 +6,6 @@ import cv2
 
 class CustomDataset(Dataset):
     def __init__(self, root, train = True):
-        data_files = []
         if train:
             data_files = [os.path.join(root, "data_batch_{}".format(i)) for i in range(1, 6)]
         else :
