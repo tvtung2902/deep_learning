@@ -1,3 +1,5 @@
+import os
+
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
@@ -17,6 +19,7 @@ def get_args():
     parser.add_argument("--batch-size", "-b", type=int, default=8, help="Batch size")
     parser.add_argument("--image-size", "-i", type=int, default=224, help="Image size")
     parser.add_argument("--logging", "-l", type=str, default="tensorboard", help="Logging")
+    parser.add_argument("--trained-models", "-tr", type=str, default="trained_models", help="Logging")
 
     args = parser.parse_args()
     return args
@@ -34,17 +37,24 @@ if __name__ == '__main__':
 
     train_dataset = AnimalDataset(root=args.root, train=True, transform=transform)
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, drop_last=True)
+    print(train_loader)
 
     test_dataset = AnimalDataset(root=args.root, train=False, transform=transform)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=4, drop_last=True)
+
+    if not os.path.isdir(args.trained_models):
+        os.mkdir(args.trained_models)
+
 
     model = SimpleCNN(num_classes=10)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=1e-3, momentum=0.9)
 
+    best_acc = 0
     for epoch in range(num_epochs):
         model.train()
         progress_bar = tqdm(train_loader)
+
         for i, (images, labels) in enumerate(progress_bar):
             #forward
             output = model(images)
@@ -63,13 +73,19 @@ if __name__ == '__main__':
             all_labels.extend(labels)
             # khong tinh gradient trong with torch.no_grad():
             with torch.no_grad():
-                predictions = model(images) # 16 * 10
+                predictions = model(images)
                 indices = torch.argmax(predictions,1)
                 all_predictions.extend(indices)
                 loss = criterion(predictions, labels)
 
         all_predictions = [prediction.item() for prediction in all_predictions]
         all_labels = [label.item() for label in all_labels]
+        accuracy =  accuracy_score(all_labels, all_predictions)
+        print("Epoch {}/{} accuracy {:.3f}".format(epoch + 1, num_epochs, accuracy))
+        torch.save(model.state_dict(), "{}/last_cnn.pt".format(args.trained_models))
+        if accuracy > best_acc:
+            best_acc = accuracy
+            torch.save(model.state_dict(), "{}/best_cnn.pt".format(args.trained_models))
 
-        print("Epoch {}/{}".format(epoch + 1, num_epochs))
-        print(classification_report(all_labels, all_predictions))
+        # print("Epoch {}/{}".format(epoch + 1, num_epochs))
+        # print(classification_report(all_labels, all_predictions))
