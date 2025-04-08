@@ -1,8 +1,6 @@
 import torch
-from numpy.ma.core import indices
 from torch import nn, optim
 from torch.utils.data import DataLoader
-from torchvision.transforms import ToTensor
 from cifar_dataset import CIFARDataset
 from model_1 import SimpleNeuralNetwork
 from sklearn.metrics import classification_report
