@@ -28,7 +28,9 @@ class AnimalDataset(Dataset):
             image = self.transform(image)
         label = self.labels[index]
         return image, label
-
+    @staticmethod
+    def get_categories():
+        return ['butterfly', 'cat', 'chicken', 'cow', 'dog', 'elephant', 'horse', 'sheep', 'spider', 'squirrel']
 if __name__ == '__main__':
     root = '../all-data/animals'
     dataset = AnimalDataset(root, train=True)
