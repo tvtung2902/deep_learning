@@ -1,2 +1,4 @@
 .idea
 all-data/
+*.pt
+*.pth
